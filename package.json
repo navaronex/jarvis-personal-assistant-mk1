@@ -1,7 +1,7 @@
 {
   "main": "electron/main.cjs",
   "name": "jarvis-personal",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Asistente personal local para Windows: agenda, notas y correo.",
   "author": "navaronex",
   "repository": "https://github.com/navaronex/jarvis-personal-assistant-mk1",
