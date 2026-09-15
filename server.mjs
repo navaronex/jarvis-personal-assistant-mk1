@@ -430,7 +430,14 @@ const server = http.createServer(async (req, res) => {
       }
     }
     const files = {
-      "/": ["index.html", "text/html"],
+      "/": ["assistant.html", "text/html"],
+      "/assistant.html": ["assistant.html", "text/html"],
+      "/assistant.css": ["assistant.css", "text/css"],
+      "/assistant.js": ["assistant.js", "text/javascript"],
+      "/components/core-visual.js": ["components/core-visual.js", "text/javascript"],
+      "/components/conversation.js": ["components/conversation.js", "text/javascript"],
+      "/index.html": ["index.html", "text/html"],
+      "/panel": ["index.html", "text/html"],
       "/app.js": ["app.js", "text/javascript"],
       "/desktop.js": ["desktop.js", "text/javascript"],
       "/style.css": ["style.css", "text/css"],

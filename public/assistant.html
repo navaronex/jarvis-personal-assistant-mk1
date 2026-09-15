@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="J.A.R.V.I.S. Autonomous Assistant Holographic Core" />
+  <title>J.A.R.V.I.S. // Mark VII Core</title>
+  <link rel="icon" href="/favicon.svg" />
+  <link rel="stylesheet" href="/assistant.css" />
+</head>
+<body class="jarvis-theme">
+  <!-- HUD scanline and grid background -->
+  <div class="hud-overlay"></div>
+  <div class="hud-scanlines"></div>
+
+  <!-- Top Navigation & System Telemetry -->
+  <header class="hud-header">
+    <div class="hud-brand">
+      <span class="hud-brand-tag">MARK VII // PROTOTYPE SYSTEM</span>
+      <h1 class="hud-title">J.A.R.V.I.S.</h1>
+    </div>
+
+    <!-- Live Telemetry: Next Scheduled Event -->
+    <div class="hud-telemetry" id="hudTelemetry">
+      <span class="telemetry-icon">◈</span>
+      <span class="telemetry-label">PRÓXIMO COMPROMISO:</span>
+      <span class="telemetry-value" id="nextEventSnippet">Sincronizando...</span>
+    </div>
+
+    <!-- Discreet Access Navigation -->
+    <nav class="hud-nav" aria-label="Accesos del sistema">
+      <button type="button" class="hud-btn" id="btnAgenda" title="Consultar Agenda">
+        <span class="btn-icon">📅</span>
+        <span class="btn-text">AGENDA</span>
+      </button>
+      <button type="button" class="hud-btn" id="btnMail" title="Consultar Correo">
+        <span class="btn-icon">✉</span>
+        <span class="btn-text">CORREO</span>
+      </button>
+      <button type="button" class="hud-btn" id="btnSettings" title="Ajustes de Inteligencia">
+        <span class="btn-icon">⚙</span>
+        <span class="btn-text">AJUSTES</span>
+      </button>
+      <a href="/index.html" class="hud-btn hud-btn-management" id="btnManagement" title="Abrir Panel de Gestión clásico">
+        <span class="btn-icon">🎛</span>
+        <span class="btn-text">PANEL DE GESTIÓN</span>
+      </a>
+    </nav>
+  </header>
+
+  <!-- Notification Banner -->
+  <div id="noticeBanner" class="hud-notice-bar" role="status" aria-live="polite" hidden></div>
+
+  <!-- Main Holographic Center -->
+  <main class="hud-main">
+    <div class="core-container">
+      <canvas id="jarvisCoreCanvas" width="420" height="420" aria-label="Núcleo holográfico interactivo de Jarvis"></canvas>
+      
+      <!-- System State Badge -->
+      <div class="status-badge" id="systemStateBadge">
+        <span class="pulse-indicator"></span>
+        <span class="status-label" id="stateText">PREPARADO</span>
+      </div>
+    </div>
+
+    <!-- Primary Voice Button -->
+    <div class="voice-action-zone">
+      <button type="button" class="arc-mic-btn" id="micToggleBtn" aria-label="Hablar con Jarvis">
+        <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+          <line x1="12" y1="19" x2="12" y2="23"></line>
+          <line x1="8" y1="23" x2="16" y2="23"></line>
+        </svg>
+        <span class="mic-btn-label" id="micBtnLabel">PULSAR PARA HABLAR</span>
+      </button>
+    </div>
+
+    <!-- Transcript Cards: What user said and Jarvis answer -->
+    <section class="conversation-panel" id="conversationPanel" aria-label="Flujo de diálogo">
+      <article class="message-card user-card" id="userCard">
+        <span class="sender-tag">COMANDANTE</span>
+        <p class="transcript-content" id="userText">« Esperando consulta por voz o texto... »</p>
+      </article>
+
+      <article class="message-card jarvis-card" id="jarvisCard">
+        <span class="sender-tag">J.A.R.V.I.S.</span>
+        <p class="transcript-content" id="jarvisText">A sus órdenes, señor. ¿En qué puedo asistirle hoy?</p>
+      </article>
+    </section>
+
+    <!-- Alternative Text Input Form -->
+    <form class="hud-input-bar" id="textCommandForm">
+      <span class="prompt-arrow">❯</span>
+      <input 
+        type="text" 
+        id="textCommandInput" 
+        class="hud-text-input" 
+        placeholder="Escriba una orden o consulta para JARVIS... (Presione Enter)" 
+        autocomplete="off"
+      />
+      <button type="submit" class="hud-send-btn" id="btnSendText">
+        <span>ENVIAR</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </form>
+  </main>
+
+  <!-- Agenda Modal -->
+  <dialog class="hud-modal" id="agendaModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-title">◈ AGENDA // COMPROMISOS PROGRAMADOS</h2>
+        <button type="button" class="modal-close" id="btnCloseAgenda" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body" id="agendaListContent">
+        <p class="empty-tip">Cargando eventos y tareas de la agenda...</p>
+      </div>
+      <div class="modal-footer">
+        <a href="/index.html#today" class="hud-link">Abrir gestión completa en el Panel de Gestión ➔</a>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Mail Modal -->
+  <dialog class="hud-modal" id="mailModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-title">✉ CORREO // TELEMETRÍA DE BANDEJA</h2>
+        <button type="button" class="modal-close" id="btnCloseMail" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body" id="mailContent">
+        <p class="empty-tip">Comprobando estado del buzón Outlook...</p>
+      </div>
+      <div class="modal-footer">
+        <a href="/index.html#mail" class="hud-link">Ir a bandeja completa en Panel de Gestión ➔</a>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Settings Modal -->
+  <dialog class="hud-modal" id="settingsModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-title">⚙ AJUSTES // NÚCLEO DE INTELIGENCIA</h2>
+        <button type="button" class="modal-close" id="btnCloseSettings" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body" id="settingsContent">
+        <div id="desktop-settings">
+          <p id="desktop-version">Jarvis Local Assistant</p>
+          <p id="desktop-update-status"></p>
+          <p id="desktop-ai-status"></p>
+          <p id="reminder-line"></p>
+          <input type="checkbox" id="desktop-login" style="display:none;" />
+          <button type="button" id="desktop-check" style="display:none;">Actualizar</button>
+          <button type="button" id="desktop-install" style="display:none;">Instalar</button>
+          <button type="button" id="desktop-data" style="display:none;">Datos</button>
+          <button type="button" id="desktop-notification" style="display:none;">Aviso</button>
+          <button type="button" id="desktop-prepare-ai" style="display:none;">IA</button>
+          <div id="desktop-ai" hidden></div>
+          <div id="notifications" hidden></div>
+        </div>
+        <p id="modelInfoText" style="margin-top: 12px;">Modelo configurado: cargando...</p>
+      </div>
+      <div class="modal-footer">
+        <a href="/index.html#settings" class="hud-link">Ajustes avanzados en Panel de Gestión ➔</a>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Scripts -->
+  <script type="module" src="/components/core-visual.js"></script>
+  <script type="module" src="/components/conversation.js"></script>
+  <script type="module" src="/assistant.js"></script>
+  <script src="/desktop.js" defer></script>
+</body>
+</html>

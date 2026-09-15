@@ -470,7 +470,7 @@ async function startApplication() {
   if (smoke) {
     const result = {
       health: await api("/health"),
-      trayToolTip: "Jarvis",
+      tray: "Jarvis · Recordatorios activos",
       title: mainWindow.getTitle(),
       version: app.getVersion(),
       packaged: app.isPackaged,

@@ -99,6 +99,24 @@ select:focus-visible {
   gap: 16px;
   font-size: 18px;
 }
+.sidebar nav a.hud-link-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 9px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #a7f070;
+  background: rgba(167, 240, 112, 0.1);
+  text-decoration: none;
+  margin-top: 6px;
+  transition: background 0.2s ease;
+}
+.sidebar nav a.hud-link-nav:hover {
+  background: rgba(167, 240, 112, 0.22);
+  color: #ffffff;
+}
 .sidebar nav button.active {
   background: #2d5359;
   color: white;
