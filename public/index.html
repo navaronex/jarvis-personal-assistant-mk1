@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Tu asistente personal local: tareas, notas y conversación."
+    />
+    <title>Jarvis · Tu día, en orden</title>
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+    <script src="/desktop.js" defer></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <a class="brand" href="#today"
+        ><span class="mark">J</span
+        ><span>JARVIS<small>ASISTENTE PERSONAL</small></span></a
+      >
+      <nav aria-label="Principal">
+        <button data-page="today" class="active">◷ <span>Mi día</span></button
+        ><button data-page="tasks">✓ <span>Tareas</span></button
+        ><button data-page="chat">✧ <span>Conversar</span></button
+        ><button data-page="mail">✉ <span>Correo</span></button
+        ><button data-page="notes">▤ <span>Mis notas</span></button
+        ><button data-page="settings">⚙ <span>Ajustes</span></button>
+      </nav>
+      <div class="side-bottom">
+        <span class="dot"></span> Solo en este PC
+        <p>Tus pendientes tienen su sitio.</p>
+      </div>
+    </aside>
+    <main>
+      <header>
+        <span id="date"></span
+        ><span class="connection" id="connection">Comprobando conexión…</span>
+      </header>
+      <div id="notice" role="status" aria-live="polite" hidden></div>
+      <section id="today" class="page">
+        <div class="page-title">
+          <div>
+            <p class="eyebrow">UN PASO CADA VEZ</p>
+            <h1>Tu día, en orden.</h1>
+            <p class="muted">
+              Empieza por lo importante. El resto puede esperar.
+            </p>
+          </div>
+          <button class="primary" id="new-today">＋ Añadir tarea</button>
+        </div>
+        <div class="stats">
+          <article>
+            <span>Pendientes para hoy</span><strong id="count-today">0</strong>
+          </article>
+          <article>
+            <span>Con fecha vencida</span><strong id="count-overdue">0</strong>
+          </article>
+          <article>
+            <span>Completadas</span><strong id="count-done">0</strong>
+          </article>
+        </div>
+        <div class="columns">
+          <article class="panel">
+            <div class="panel-title">
+              <h2>En tu agenda</h2>
+              <button class="link" data-go="tasks">Ver todas →</button>
+            </div>
+            <div id="today-list"></div>
+          </article>
+          <article class="panel focus">
+            <span class="eyebrow">UN MOMENTO PARA PLANIFICAR</span>
+            <h2>Vamos a ponerlo fácil.</h2>
+            <p>
+              Jarvis puede ayudarte a ordenar tus pendientes y preparar el
+              siguiente paso.
+            </p>
+            <button class="primary" id="plan-day">Planificar mi día →</button>
+            <p class="caption">
+              Guarda tus reuniones y compromisos desde Tareas.
+            </p>
+          </article>
+        </div>
+        <p class="caption" id="reminder-line">
+          Reuniones y compromisos: aviso 15 minutos antes y a la hora. Mantén
+          Jarvis junto al reloj y el PC encendido.
+        </p>
+        <button class="link" id="notifications">
+          Activar avisos del navegador
+        </button>
+      </section>
+      <section id="tasks" class="page" hidden>
+        <div class="page-title">
+          <div>
+            <p class="eyebrow">PASO A PASO</p>
+            <h1>Tus tareas</h1>
+          </div>
+          <button class="primary" id="new-task">＋ Añadir tarea</button>
+        </div>
+        <div class="filters" aria-label="Filtrar tareas">
+          <button data-filter="pending" class="selected">Pendientes</button
+          ><button data-filter="done">Completadas</button
+          ><button data-filter="all">Todas</button>
+        </div>
+        <div class="panel" id="task-list"></div>
+      </section>
+      <section id="chat" class="page" hidden>
+        <div class="page-title">
+          <div>
+            <p class="eyebrow">TU ASISTENTE</p>
+            <h1>Hablemos.</h1>
+          </div>
+          <button class="secondary" id="clear-chat">Vaciar conversación</button>
+        </div>
+        <p class="muted">
+          Consulta tus notas, prepara un texto o piensa el siguiente paso.
+        </p>
+        <div id="messages" aria-live="polite"></div>
+        <form id="chat-form" class="composer">
+          <label for="prompt" class="sr-only">Mensaje para Jarvis</label
+          ><textarea
+            id="prompt"
+            maxlength="6000"
+            rows="3"
+            placeholder="¿En qué te ayudo?"
+            required
+          ></textarea>
+          <div>
+            <span id="chat-state" role="status"
+              >La IA puede equivocarse. Revisa fechas y datos.</span
+            ><button class="primary" id="send">Enviar ↑</button>
+          </div>
+        </form>
+      </section>
+      <section id="notes" class="page" hidden>
+        <div class="page-title">
+          <div>
+            <p class="eyebrow">LO QUE CONVIENE RECORDAR</p>
+            <h1>Mis notas</h1>
+          </div>
+          <div class="actions">
+            <button class="secondary" id="import-note">
+              Importar .md / .txt</button
+            ><button class="primary" id="new-note">＋ Nueva nota</button>
+          </div>
+        </div>
+        <label for="search-notes">Buscar en tus notas</label
+        ><input
+          id="search-notes"
+          type="search"
+          placeholder="Cliente, proyecto o palabra…"
+        />
+        <div id="note-list" class="note-grid"></div>
+        <input
+          id="note-file"
+          type="file"
+          accept=".md,.txt,text/plain,text/markdown"
+          hidden
+        />
+      </section>
+      <section id="mail" class="page" hidden>
+        <div class="page-title">
+          <div>
+            <p class="eyebrow">ATENCIÓN A LAS INCIDENCIAS</p>
+            <h1>Correo de trabajo</h1>
+          </div>
+        </div>
+        <article class="panel">
+          <h2>Outlook clásico</h2>
+          <p>
+            Con tu autorización, Jarvis lee hasta 50 correos recientes de la
+            bandeja de entrada predeterminada de Outlook clásico, de los últimos
+            7 días. Revisa cada 5 minutos mientras Jarvis esté en marcha.
+          </p>
+          <p>
+            No envía mensajes ni los marca como leídos. El contenido se conserva
+            solo en memoria, salvo que lo guardes como nota o lo envíes al chat
+            local.
+          </p>
+          <div class="actions">
+            <button class="primary" id="connect-mail">
+              Autorizar lectura en este PC</button
+            ><button class="secondary" id="check-mail">Comprobar ahora</button
+            ><button class="secondary" id="disconnect-mail">Desconectar</button>
+          </div>
+          <p id="mail-status" role="status">Sin conectar.</p>
+          <p class="caption">
+            El nuevo Outlook y Gmail web necesitan otra integración. Una señal
+            de urgencia es orientativa: puede omitir incidencias o marcar
+            mensajes que ya están resueltos.
+          </p>
+        </article>
+        <div id="mail-list" class="note-grid"></div>
+        <article class="panel settings-panel">
+          <h2>Revisar un correo pegado</h2>
+          <form id="mail-form">
+            <label for="mail-subject">Asunto</label
+            ><input id="mail-subject" maxlength="500" /><label for="mail-body"
+              >Texto del correo</label
+            ><textarea
+              id="mail-body"
+              rows="6"
+              maxlength="12000"
+              required
+            ></textarea>
+            <div class="actions">
+              <button class="primary">Buscar señales de urgencia</button
+              ><button type="button" class="secondary" id="mail-task">
+                Crear tarea de seguimiento</button
+              ><button type="button" class="secondary" id="read-mail">
+                Leer en voz alta</button
+              ><button type="button" class="secondary" id="stop-voice">
+                Detener voz
+              </button>
+            </div>
+          </form>
+          <div id="mail-analysis" role="status"></div>
+        </article>
+      </section>
+      <section id="settings" class="page" hidden>
+        <div class="page-title">
+          <div>
+            <p class="eyebrow">A TU MANERA</p>
+            <h1>Ajustes</h1>
+          </div>
+        </div>
+        <article id="desktop-settings" class="panel settings-panel" hidden>
+          <h2>Aplicación de escritorio</h2>
+          <p id="desktop-version"></p>
+          <label
+            ><input type="checkbox" id="desktop-login" /> Iniciar Jarvis al
+            entrar en Windows</label
+          >
+          <div class="actions">
+            <button class="secondary" id="desktop-notification">
+              Probar un aviso</button
+            ><button class="secondary" id="desktop-data">
+              Abrir carpeta de datos
+            </button>
+          </div>
+          <h3>Actualizaciones</h3>
+          <p id="desktop-update-status" role="status"></p>
+          <div class="actions">
+            <button class="secondary" id="desktop-check">
+              Buscar actualizaciones</button
+            ><button class="primary" id="desktop-install" hidden>
+              Reiniciar para actualizar
+            </button>
+          </div>
+          <p class="caption">
+            Jarvis busca versiones al arrancar y cada 6 horas. Las descarga en
+            segundo plano y las instala al salir o cuando elijas reiniciar.
+          </p>
+        </article>
+        <article class="panel settings-panel">
+          <h2>Inteligencia local</h2>
+          <p>Abre Ollama y elige un modelo descargado en este PC.</p>
+          <label for="model">Modelo para conversar</label
+          ><select id="model">
+            <option value="">Selecciona un modelo</option>
+          </select>
+          <div class="actions">
+            <button class="primary" id="save-model">Guardar modelo</button
+            ><button class="secondary" id="refresh-models">
+              Comprobar conexión
+            </button>
+          </div>
+          <p id="model-help" role="status"></p>
+          <div id="desktop-ai" hidden>
+            <button class="secondary" id="desktop-prepare-ai">
+              Preparar inteligencia local
+            </button>
+            <p id="desktop-ai-status" role="status"></p>
+          </div>
+        </article>
+        <article class="panel settings-panel">
+          <h2>Tus datos, a salvo</h2>
+          <p>
+            Tus datos se guardan separados del programa y se conservan al
+            actualizar. Descarga una copia y guárdala en otro disco.
+          </p>
+          <div class="actions">
+            <a class="button secondary" href="/api/backup" download
+              >Descargar copia</a
+            ><button class="secondary" id="restore">Restaurar copia</button>
+          </div>
+          <input
+            id="backup-file"
+            type="file"
+            accept=".json,application/json"
+            hidden
+          />
+          <p class="caption">
+            La restauración sustituye los datos actuales. Descarga antes una
+            copia.
+          </p>
+        </article>
+        <article class="panel settings-panel">
+          <h2>Qué hace esta versión</h2>
+          <p>
+            Organiza tareas, guarda notas y conversa con Ollama. Las notas
+            importadas son copias: vuelve a importarlas si cambian en Obsidian.
+          </p>
+          <p>
+            El chat propone; tú decides y guardas. Los avisos de Windows
+            necesitan el PC encendido y el icono de Jarvis junto al reloj,
+            aunque cierres esta ventana. Incluye lectura opcional de Outlook
+            clásico y lectura en voz alta si Windows dispone de una voz local en
+            español. No sincroniza calendarios externos.
+          </p>
+        </article>
+      </section>
+      <footer>JARVIS <span>Tu espacio de trabajo personal.</span></footer>
+    </main>
+    <dialog id="task-dialog">
+      <form id="task-form">
+        <h2 id="task-heading">Nueva tarea</h2>
+        <input id="task-id" type="hidden" /><label for="task-title"
+          >¿Qué hay que hacer?</label
+        ><input
+          id="task-title"
+          maxlength="300"
+          required
+          placeholder="Por ejemplo: revisar el presupuesto"
+        /><label for="task-due">Fecha y hora (opcional)</label
+        ><input id="task-due" type="datetime-local" /><label for="task-priority"
+          >Prioridad</label
+        ><select id="task-priority">
+          <option value="normal">Normal</option>
+          <option value="alta">Alta</option>
+        </select>
+        <div class="actions">
+          <button type="button" class="secondary" data-close="task-dialog">
+            Cancelar</button
+          ><button class="primary">Guardar tarea</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="note-dialog">
+      <form id="note-form">
+        <h2 id="note-heading">Nueva nota</h2>
+        <input id="note-id" type="hidden" /><label for="note-title"
+          >Título</label
+        ><input id="note-title" maxlength="200" required /><label
+          for="note-body"
+          >Contenido</label
+        ><textarea
+          id="note-body"
+          rows="12"
+          maxlength="60000"
+          required
+        ></textarea>
+        <div class="actions">
+          <button type="button" class="secondary" data-close="note-dialog">
+            Cancelar</button
+          ><button class="primary">Guardar nota</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>

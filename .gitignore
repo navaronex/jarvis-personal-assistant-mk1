@@ -1,0 +1,33 @@
+# Excluir datos personales y configuraciones locales
+.env
+config_personal.json
+*.log
+credentials/
+
+# Excluir modelos pesados (ej. Inteligencia Artificial / Machine Learning)
+*.pkl
+*.h5
+*.onnx
+*.pt
+*.pth
+modelos/
+
+# Excluir ejecutables y archivos binarios compilados
+*.exe
+*.out
+*.app
+bin/
+obj/
+
+# Dependencias, datos privados y artefactos locales
+node_modules/
+datos/
+runtime/node.exe
+motor/
+motor-*/
+dist/
+.cache/
+*.sqlite*
+ollama-download.zip
+desktop-preferences.json
+build/backend-package.json

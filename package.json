@@ -1,0 +1,101 @@
+{
+  "main": "electron/main.cjs",
+  "name": "jarvis-personal",
+  "version": "0.3.0",
+  "description": "Asistente personal local para Windows: agenda, notas y correo.",
+  "author": "navaronex",
+  "repository": "https://github.com/navaronex/jarvis-personal-assistant-mk1",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "start:server": "node server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "prepare:runtime": "node scripts/prepare-runtime.mjs",
+    "build:dir": "electron-builder --dir --win --x64 --publish never",
+    "dist:win": "electron-builder --win nsis --x64 --publish never",
+    "test:desktop": "node scripts/desktop-smoke.cjs"
+  },
+  "devDependencies": {
+    "electron": "44.3.0",
+    "electron-builder": "26.15.3"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.9"
+  },
+  "build": {
+    "appId": "com.navaronex.jarvis",
+    "productName": "Jarvis",
+    "asar": true,
+    "beforePack": "scripts/before-pack.cjs",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "runtime",
+        "to": "runtime",
+        "filter": [
+          "node.exe",
+          "LICENSE"
+        ]
+      },
+      {
+        "from": ".",
+        "to": "backend",
+        "filter": [
+          "server.mjs",
+          "mail.mjs",
+          "setup.mjs",
+          "Extraer motor.ps1",
+          "Leer Outlook.ps1",
+          "lib/**/*",
+          "public/**/*"
+        ]
+      },
+      {
+        "from": "build/backend-package.json",
+        "to": "backend/package.json"
+      },
+      {
+        "from": "build",
+        "to": "icons",
+        "filter": [
+          "icon.ico",
+          "icon.png"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "Jarvis-Setup-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Jarvis"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "navaronex",
+        "repo": "jarvis-personal-assistant-mk1",
+        "releaseType": "draft"
+      }
+    ]
+  }
+}

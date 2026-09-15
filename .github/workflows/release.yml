@@ -1,0 +1,31 @@
+name: Construir instalador de Jarvis
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.15.0"
+          cache: npm
+      - name: Comprobar versión de la etiqueta
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          if ($env:GITHUB_REF_NAME -ne "v$version") { throw 'La etiqueta no coincide con package.json.' }
+      - run: npm ci
+      - run: npm run prepare:runtime
+      - name: Generar icono
+        shell: pwsh
+        run: ./scripts/make-icon.ps1
+      - run: npm test
+      - name: Construir y subir un borrador de versión
+        run: npx --no-install electron-builder --win nsis --x64 --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
