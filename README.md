@@ -2,8 +2,6 @@
 
 Asistente local para agenda, notas, consulta a un modelo local y revisión de posibles urgencias de correo. Proyecto de aprendizaje y prototipo para uso personal. La interfaz es HTML/CSS/JavaScript, alojada en una aplicación Electron con ventana y bandeja de Windows.
 
-**Estado de la entrega:** 25 pruebas automáticas pasan y el ejecutable sin instalador se empaqueta correctamente. Quedan sin resolver el arranque gráfico detectado durante las pruebas y la creación del instalador NSIS. Consulta el diagnóstico y el orden de continuación en `CONTINUAR.md`; todavía no es una entrega validada para el PC de tu padre.
-
 ## Desarrollo
 
 Desde esta carpeta, con Node 24.15.0 y npm:
